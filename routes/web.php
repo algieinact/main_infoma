@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProviderDashboardController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ProviderDiscountController;
 
 
 // Authentication Routes
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
@@ -113,6 +115,15 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
     Route::put('/activities/{id}', [ActivityController::class, 'update'])->name('activities.update');
     Route::delete('/activities/{id}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+    
+    // Discount Management
+    Route::get('/discounts', [ProviderDiscountController::class, 'index'])->name('discounts.index');
+    Route::get('/discounts/create', [ProviderDiscountController::class, 'create'])->name('discounts.create');
+    Route::post('/discounts', [ProviderDiscountController::class, 'store'])->name('discounts.store');
+    Route::get('/discounts/{discount}/edit', [ProviderDiscountController::class, 'edit'])->name('discounts.edit');
+    Route::put('/discounts/{discount}', [ProviderDiscountController::class, 'update'])->name('discounts.update');
+    Route::delete('/discounts/{discount}', [ProviderDiscountController::class, 'destroy'])->name('discounts.destroy');
+    Route::get('/discounts/get-items', [ProviderDiscountController::class, 'getItems'])->name('discounts.get-items');
 });
 
 // Admin Routes

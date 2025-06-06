@@ -73,7 +73,12 @@ class BookingController extends BaseController
                 'bookable_id' => 'required|integer',
                 'start_date' => 'required|date|after:today',
                 'discount_code' => 'nullable|string',
+                'payment_method' => 'required|in:bank_transfer,e_wallet',
             ];
+
+            if ($request->payment_method === 'e_wallet') {
+                $rules['e_wallet_type'] = 'required|in:gopay,ovo,dana,linkaja';
+            }
 
             if ($type === 'App\Models\Residence') {
                 $rules = array_merge($rules, [
@@ -183,12 +188,21 @@ class BookingController extends BaseController
 
             // Create transaction if amount > 0
             if ($finalAmount > 0) {
+                $paymentDetails = [
+                    'method' => $request->payment_method,
+                ];
+
+                if ($request->payment_method === 'e_wallet') {
+                    $paymentDetails['e_wallet_type'] = $request->e_wallet_type;
+                }
+
                 Transaction::create([
                     'transaction_code' => 'TRX-' . strtoupper(Str::random(8)),
                     'booking_id' => $booking->id,
                     'user_id' => Auth::id(),
                     'type' => 'payment',
-                    'method' => 'bank_transfer', // Default method
+                    'method' => $request->payment_method,
+                    'payment_details' => json_encode($paymentDetails),
                     'amount' => $finalAmount,
                     'status' => 'pending',
                 ]);
@@ -207,7 +221,7 @@ class BookingController extends BaseController
 
             DB::commit();
 
-            return redirect()->route('dashboard')->with('success', 'Booking berhasil dibuat! Menunggu persetujuan dari penyedia.');
+            return redirect()->route('bookings.show', $booking)->with('success', 'Booking berhasil dibuat! Silakan lakukan pembayaran sesuai metode yang dipilih.');
 
         } catch (\Exception $e) {
             DB::rollback();

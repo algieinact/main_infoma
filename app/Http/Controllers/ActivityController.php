@@ -175,6 +175,12 @@ class ActivityController extends Controller
 
     public function store(Request $request)
     {
+        // Konversi requirements dan benefits ke array jika berupa string
+        $request->merge([
+            'requirements' => is_array($request->requirements) ? $request->requirements : array_filter(array_map('trim', explode(',', $request->requirements))),
+            'benefits' => is_array($request->benefits) ? $request->benefits : array_filter(array_map('trim', explode(',', $request->benefits))),
+        ]);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -228,6 +234,12 @@ class ActivityController extends Controller
         if ($activity->provider_id !== auth()->id()) {
             abort(403);
         }
+
+        // Konversi requirements dan benefits ke array jika berupa string
+        $request->merge([
+            'requirements' => is_array($request->requirements) ? $request->requirements : array_filter(array_map('trim', explode(',', $request->requirements))),
+            'benefits' => is_array($request->benefits) ? $request->benefits : array_filter(array_map('trim', explode(',', $request->benefits))),
+        ]);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',

@@ -6,7 +6,7 @@
 <div class="bg-gray-100 min-h-screen py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard Saya</h1>
-        
+
         <!-- Status Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow p-6">
@@ -16,7 +16,8 @@
                     </div>
                     <div class="ml-4">
                         <h2 class="text-gray-600 text-sm">Menunggu Konfirmasi</h2>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $bookingCounts['pending'] }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">
+                            {{ $bookings->where('status', 'waiting_provider_approval')->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -27,18 +28,8 @@
                     </div>
                     <div class="ml-4">
                         <h2 class="text-gray-600 text-sm">Dikonfirmasi</h2>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $bookingCounts['confirmed'] }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                        <i class="fas fa-history w-6 h-6"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h2 class="text-gray-600 text-sm">Selesai</h2>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $bookingCounts['completed'] }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">
+                            {{ $bookings->where('status', 'provider_approved')->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -49,7 +40,19 @@
                     </div>
                     <div class="ml-4">
                         <h2 class="text-gray-600 text-sm">Dibatalkan</h2>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $bookingCounts['cancelled'] }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">
+                            {{ $bookings->where('status', 'provider_rejected')->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-history w-6 h-6"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Total booking</h2>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $bookings->total() }}</p>
                     </div>
                 </div>
             </div>
@@ -64,26 +67,34 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Mulai</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Selesai</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Kode</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tipe</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Nama</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal Mulai</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal Selesai</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($bookings as $booking)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->booking_code }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->booking_code }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 @if($booking->bookable_type === 'App\\Models\\Residence')
-                                    Tempat Tinggal
+                                Tempat Tinggal
                                 @elseif($booking->bookable_type === 'App\\Models\\Activity')
-                                    Kegiatan
+                                Kegiatan
                                 @else
-                                    -
+                                -
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -106,7 +117,8 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('bookings.show', $booking) }}" class="text-blue-600 hover:text-blue-900">Detail</a>
+                                <a href="{{ route('bookings.show', $booking) }}"
+                                    class="text-blue-600 hover:text-blue-900">Detail</a>
                             </td>
                         </tr>
                         @empty

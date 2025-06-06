@@ -235,6 +235,96 @@
                         @enderror
                     </div>
 
+                    <!-- Payment Information -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Payment Information</h2>
+                        
+                        <!-- Price Summary -->
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Base Price:</span>
+                                    <span class="font-medium" id="basePrice">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between" id="discountRow" style="display: none;">
+                                    <span class="text-gray-600">Discount:</span>
+                                    <span class="font-medium text-green-600" id="discountAmount">-Rp 0</span>
+                                </div>
+                                <div class="border-t border-gray-200 my-2"></div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-900 font-semibold">Total Amount:</span>
+                                    <span class="text-gray-900 font-bold" id="totalAmount">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Methods -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-medium text-gray-900">Payment Methods</h3>
+                            
+                            <!-- Bank Transfer -->
+                            <div class="border rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment_method" id="bank_transfer" value="bank_transfer" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                                    <label for="bank_transfer" class="ml-3 block">
+                                        <span class="text-sm font-medium text-gray-900">Bank Transfer</span>
+                                        <span class="text-sm text-gray-500 block">Transfer to our bank account</span>
+                                    </label>
+                                </div>
+                                <div id="bankDetails" class="mt-3 ml-7 space-y-2">
+                                    <div class="text-sm">
+                                        <span class="font-medium">Bank BCA</span>
+                                        <p class="text-gray-600">Account Number: 1234567890</p>
+                                        <p class="text-gray-600">Account Name: PT Infoma</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- E-Wallet -->
+                            <div class="border rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment_method" id="e_wallet" value="e_wallet" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                    <label for="e_wallet" class="ml-3 block">
+                                        <span class="text-sm font-medium text-gray-900">E-Wallet</span>
+                                        <span class="text-sm text-gray-500 block">Pay using e-wallet</span>
+                                    </label>
+                                </div>
+                                <div id="eWalletDetails" class="mt-3 ml-7 space-y-2" style="display: none;">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <input type="radio" name="e_wallet_type" id="gopay" value="gopay" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                            <label for="gopay" class="ml-2 text-sm text-gray-900">GoPay</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="e_wallet_type" id="ovo" value="ovo" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                            <label for="ovo" class="ml-2 text-sm text-gray-900">OVO</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="e_wallet_type" id="dana" value="dana" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                            <label for="dana" class="ml-2 text-sm text-gray-900">DANA</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="e_wallet_type" id="linkaja" value="linkaja" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                            <label for="linkaja" class="ml-2 text-sm text-gray-900">LinkAja</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Instructions -->
+                        <div class="mt-6 bg-blue-50 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-blue-900">Payment Instructions:</h3>
+                            <ol class="mt-2 text-sm text-blue-700 list-decimal list-inside space-y-1">
+                                <li>Complete the booking form and click "Create Booking"</li>
+                                <li>You will receive a booking confirmation with payment details</li>
+                                <li>Make the payment using your chosen payment method</li>
+                                <li>Upload your payment proof in the booking details page</li>
+                                <li>Wait for payment confirmation from our team</li>
+                            </ol>
+                        </div>
+                    </div>
+
                     <!-- Submit Button -->
                     <div class="flex justify-end">
                         <button type="submit"
@@ -306,64 +396,96 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle discount code check
-    const checkDiscountBtn = document.getElementById('checkDiscountBtn');
+    // Payment method selection
+    const bankTransfer = document.getElementById('bank_transfer');
+    const eWallet = document.getElementById('e_wallet');
+    const bankDetails = document.getElementById('bankDetails');
+    const eWalletDetails = document.getElementById('eWalletDetails');
+
+    bankTransfer.addEventListener('change', function() {
+        if (this.checked) {
+            bankDetails.style.display = 'block';
+            eWalletDetails.style.display = 'none';
+        }
+    });
+
+    eWallet.addEventListener('change', function() {
+        if (this.checked) {
+            bankDetails.style.display = 'none';
+            eWalletDetails.style.display = 'block';
+        }
+    });
+
+    // Discount code handling
     const discountCode = document.getElementById('discount_code');
+    const checkDiscountBtn = document.getElementById('checkDiscountBtn');
     const discountResult = document.getElementById('discountResult');
+    const discountRow = document.getElementById('discountRow');
+    const discountAmount = document.getElementById('discountAmount');
+    const totalAmount = document.getElementById('totalAmount');
+    const basePrice = document.getElementById('basePrice');
 
-    if (checkDiscountBtn && discountCode) {
-        checkDiscountBtn.addEventListener('click', async function() {
-            if (!discountCode.value) {
-                discountResult.innerHTML = '<span class="text-red-600">Please enter a discount code</span>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/discounts/check/${discountCode.value}`, {
-                    method: 'GET',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    discountResult.innerHTML = `<span class="text-green-600">${data.message}</span>`;
-                } else {
-                    discountResult.innerHTML = `<span class="text-red-600">${data.message}</span>`;
-                }
-            } catch (error) {
-                discountResult.innerHTML = '<span class="text-red-600">Error checking discount code</span>';
-            }
-        });
-    }
-
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Validate required fields
-        const requiredFields = form.querySelectorAll('[required]');
-        let isValid = true;
-
-        requiredFields.forEach(field => {
-            if (!field.value) {
-                field.classList.add('border-red-500');
-                isValid = false;
-            } else {
-                field.classList.remove('border-red-500');
-            }
-        });
-
-        if (!isValid) {
-            alert('Please fill in all required fields');
+    checkDiscountBtn.addEventListener('click', function() {
+        const code = discountCode.value;
+        if (!code) {
+            discountResult.innerHTML = '<p class="text-red-600">Please enter a discount code</p>';
             return;
         }
 
-        // Submit form
-        this.submit();
+        // Show loading state
+        checkDiscountBtn.disabled = true;
+        checkDiscountBtn.innerHTML = 'Checking...';
+        discountResult.innerHTML = '<p class="text-gray-600">Checking discount code...</p>';
+
+        // Make API call to check discount
+        fetch(`/api/bookings/check-discount`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                discount_code: code,
+                bookable_type: document.querySelector('input[name="bookable_type"]').value,
+                bookable_id: document.querySelector('input[name="bookable_id"]').value,
+                amount: parseFloat(basePrice.textContent.replace(/[^0-9.-]+/g, ''))
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                discountResult.innerHTML = '<p class="text-green-600">' + data.message + '</p>';
+                discountRow.style.display = 'flex';
+                discountAmount.textContent = '-Rp ' + data.discount_amount.toLocaleString('id-ID');
+                totalAmount.textContent = 'Rp ' + data.final_amount.toLocaleString('id-ID');
+            } else {
+                discountResult.innerHTML = '<p class="text-red-600">' + data.message + '</p>';
+                discountRow.style.display = 'none';
+                totalAmount.textContent = basePrice.textContent;
+            }
+        })
+        .catch(error => {
+            discountResult.innerHTML = '<p class="text-red-600">Error checking discount code</p>';
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            checkDiscountBtn.disabled = false;
+            checkDiscountBtn.innerHTML = 'Check';
+        });
+    });
+
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        if (selectedPaymentMethod === 'e_wallet') {
+            const selectedEWallet = document.querySelector('input[name="e_wallet_type"]:checked');
+            if (!selectedEWallet) {
+                e.preventDefault();
+                alert('Please select an e-wallet type');
+                return;
+            }
+        }
     });
 });
 </script>

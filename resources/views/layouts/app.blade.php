@@ -94,9 +94,9 @@
                                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
                                 </path>
                             </svg>
-                            @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                            @if(auth()->user()->notifications()->whereNull('read_at')->count() > 0)
                             <span
-                                class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{{ $unreadNotifications }}</span>
+                                class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{{ auth()->user()->notifications()->whereNull('read_at')->count() }}</span>
                             @endif
                         </button>
 
@@ -105,20 +105,54 @@
                             <div class="px-4 py-2 text-sm text-gray-700 border-b">
                                 <strong>Notifikasi</strong>
                             </div>
-                            @forelse(auth()->user()->notifications()->latest()->take(5)->get() ?? [] as $notification)
-                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b">
-                                <p class="font-medium">{{ $notification->data['title'] ?? 'Notifikasi' }}</p>
-                                <p class="text-gray-500 text-xs">{{ $notification->created_at->diffForHumans() }}</p>
+                            @forelse(auth()->user()->notifications()->latest()->take(5)->get() as $notification)
+                            <a href="{{ route('notifications.show', $notification) }}" 
+                               class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b {{ $notification->read_at ? 'bg-gray-50' : 'bg-white' }}">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        @php
+                                            $status = $notification->data['status'] ?? null;
+                                        @endphp
+                                        @switch($status)
+                                            @case('provider_approved')
+                                                <div class="p-1 rounded-full bg-green-100">
+                                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </div>
+                                                @break
+                                            @case('provider_rejected')
+                                                <div class="p-1 rounded-full bg-red-100">
+                                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </div>
+                                                @break
+                                            @default
+                                                <div class="p-1 rounded-full bg-blue-100">
+                                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </div>
+                                        @endswitch
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="font-medium text-gray-900">{{ $notification->data['message'] ?? 'Notifikasi baru' }}</p>
+                                        <p class="text-gray-500 text-xs mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
                             </a>
                             @empty
                             <div class="px-4 py-3 text-sm text-gray-500 text-center">
                                 Tidak ada notifikasi
                             </div>
                             @endforelse
-                            <a href="{{ route('notifications.index') }}"
-                                class="block w-full text-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">
-                                Lihat Semua
-                            </a>
+                            <div class="border-t border-gray-100">
+                                <a href="{{ route('notifications.index') }}"
+                                    class="block w-full text-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">
+                                    Lihat Semua Notifikasi
+                                </a>
+                            </div>
                         </div>
                     </div>
 
