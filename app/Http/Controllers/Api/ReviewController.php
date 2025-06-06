@@ -28,6 +28,23 @@ class ReviewController extends BaseController
             $query->where('rating', $request->rating);
         }
 
+        if ($request->has('reviewable_id')) {
+            $query->where('reviewable_id', $request->reviewable_id);
+        }
+
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        // Apply sorting
+        $sortField = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $allowedSortFields = ['created_at', 'rating', 'review_date'];
+        
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
         $reviews = $query->with(['user', 'booking', 'reviewable'])
             ->latest()
             ->paginate($request->get('per_page', 10));

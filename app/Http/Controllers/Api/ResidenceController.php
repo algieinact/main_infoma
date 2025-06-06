@@ -37,6 +37,15 @@ class ResidenceController extends BaseController
             $query->featured();
         }
 
+        // Apply sorting
+        $sortField = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $allowedSortFields = ['created_at', 'price', 'rating', 'available_rooms'];
+        
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
         // Always show active residences
         $query->active();
 

@@ -45,6 +45,15 @@ class ActivityController extends BaseController
             $query->featured();
         }
 
+        // Apply sorting
+        $sortField = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $allowedSortFields = ['created_at', 'price', 'rating', 'start_date', 'current_participants'];
+        
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
         // Always show active activities
         $query->active();
 

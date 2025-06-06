@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\BookmarkController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\DiscountController;
+use App\Http\Controllers\Api\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
     Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->middleware('role:provider');
     Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject'])->middleware('role:provider');
+    Route::get('/bookings/{booking}/files/{fileType}', [BookingController::class, 'downloadFile']);
 
     // Review routes
     Route::get('/reviews', [ReviewController::class, 'index']);
@@ -68,4 +71,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+
+    // Discount routes
+    Route::post('/discounts/check', [DiscountController::class, 'check']);
+
+    // Payment routes
+    Route::get('/payments/bank-accounts', [TransactionController::class, 'getBankAccounts']);
+    Route::get('/payments/{transaction}/status', [TransactionController::class, 'checkPaymentStatus']);
 }); 
