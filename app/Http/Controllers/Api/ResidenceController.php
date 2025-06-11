@@ -2,186 +2,262 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Residence;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
-class ResidenceController extends BaseController
+class ResidenceController extends Controller
 {
-    /**
-     * Display a listing of residences.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function index(Request $request)
     {
-        $query = Residence::query();
+        $query = Residence::with(['provider', 'category'])
+            ->where('is_active', 1)
+            ->where('available_rooms', '>', 0);
 
-        // Apply filters
-        if ($request->has('type')) {
-            $query->byType($request->type);
+        // Search by title or city
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('city', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+            });
         }
 
-        if ($request->has('city')) {
-            $query->byCity($request->city);
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
         }
 
-        if ($request->has(['min_price', 'max_price'])) {
-            $query->byPriceRange($request->min_price, $request->max_price);
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
         }
 
-        if ($request->has('featured')) {
-            $query->featured();
+        // Filter by gender type
+        if ($request->filled('gender_type')) {
+            $query->where('gender_type', $request->gender_type);
         }
 
-        // Apply sorting
-        $sortField = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
-        $allowedSortFields = ['created_at', 'price', 'rating', 'available_rooms'];
-        
-        if (in_array($sortField, $allowedSortFields)) {
-            $query->orderBy($sortField, $sortDirection);
+        // Filter by city
+        if ($request->filled('city')) {
+            $query->where('city', $request->city);
         }
 
-        // Always show active residences
-        $query->active();
+        // Filter by price range
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
 
-        $residences = $query->with(['provider', 'category'])
-            ->paginate($request->get('per_page', 10));
+        // Sort
+        $sort = $request->get('sort', 'newest');
+        switch ($sort) {
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'rating':
+                $query->orderBy('rating', 'desc');
+                break;
+            case 'featured':
+                $query->orderBy('is_featured', 'desc')->orderBy('rating', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+        }
 
-        return $this->sendResponse($residences, 'Residences retrieved successfully');
+        $residences = $query->paginate(12);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $residences
+        ]);
     }
 
-    /**
-     * Display the specified residence.
-     *
-     * @param  \App\Models\Residence  $residence
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show(Residence $residence)
+    public function show($id)
     {
-        $residence->load(['provider', 'category', 'reviews.user']);
+        $residence = Residence::with([
+            'provider',
+            'category',
+            'reviews' => function($q) { $q->latest(); },
+            'reviews.user'
+        ])
+        ->where('id', $id)
+        ->where('is_active', 1)
+        ->firstOrFail();
 
-        return $this->sendResponse($residence, 'Residence retrieved successfully');
+        // Log user activity
+        if (Auth::check()) {
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activityable_id' => $residence->id,
+                'activityable_type' => Residence::class,
+                'action' => 'view',
+                'metadata' => [
+                    'title' => $residence->title,
+                    'viewed_at' => now()
+                ]
+            ]);
+        }
+
+        // Get similar residences
+        $similarResidences = Residence::with(['provider', 'category'])
+            ->where('id', '!=', $residence->id)
+            ->where('category_id', $residence->category_id)
+            ->where('city', $residence->city)
+            ->where('is_active', 1)
+            ->where('available_rooms', '>', 0)
+            ->orderBy('rating', 'desc')
+            ->limit(4)
+            ->get();
+
+        // Calculate average rating
+        $averageRating = $residence->reviews()->avg('rating') ?? 0;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'residence' => $residence,
+                'similar_residences' => $similarResidences,
+                'average_rating' => $averageRating
+            ]
+        ]);
     }
 
-    /**
-     * Store a newly created residence.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'category_id' => 'required|exists:categories,id',
+        $input = $request->all();
+        // Convert string input to array if needed
+        if (isset($input['facilities']) && is_string($input['facilities'])) {
+            $input['facilities'] = array_filter(array_map('trim', explode(',', $input['facilities'])));
+        }
+        if (isset($input['rules']) && is_string($input['rules'])) {
+            $input['rules'] = array_filter(array_map('trim', explode(',', $input['rules'])));
+        }
+
+        $validator = Validator::make($input, [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'type' => 'required|string|in:apartment,dormitory,house',
+            // Batasi value type hanya pada value yang diizinkan
+            'type' => 'required|string|in:apartment,kost,villa,rumah,lainnya',
             'price' => 'required|numeric|min:0',
-            'price_period' => 'required|string|in:day,week,month,year',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'price_period' => 'required|string',
+            'address' => 'required|string',
+            'city' => 'required|string',
+            'province' => 'required|string',
             'facilities' => 'required|array',
             'rules' => 'required|array',
-            'images' => 'required|array|min:1',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'total_rooms' => 'required|integer|min:1',
             'available_rooms' => 'required|integer|min:0',
-            'gender_type' => 'required|string|in:male,female,mixed',
-            'available_from' => 'required|date',
+            'gender_type' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
-            return $this->sendValidationError($validator->errors()->toArray());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
+
+        $validated = $validator->validated();
+        $validated['provider_id'] = Auth::id();
+        $validated['slug'] = Str::slug($validated['title']);
+        $validated['is_active'] = true;
+        $validated['is_featured'] = false;
+        $validated['rating'] = 0;
+        $validated['total_reviews'] = 0;
 
         // Handle image uploads
-        $images = [];
-        foreach ($request->file('images') as $image) {
-            $path = $image->store('residences', 'public');
-            $images[] = $path;
+        if ($request->hasFile('images')) {
+            $images = [];
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('residences', 'public');
+                $images[] = $path;
+            }
+            $validated['images'] = $images;
         }
 
-        $residence = Residence::create([
-            'provider_id' => $request->user()->id,
-            'category_id' => $request->category_id,
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'description' => $request->description,
-            'type' => $request->type,
-            'price' => $request->price,
-            'price_period' => $request->price_period,
-            'address' => $request->address,
-            'city' => $request->city,
-            'province' => $request->province,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'facilities' => $request->facilities,
-            'rules' => $request->rules,
-            'images' => $images,
-            'total_rooms' => $request->total_rooms,
-            'available_rooms' => $request->available_rooms,
-            'gender_type' => $request->gender_type,
-            'available_from' => $request->available_from,
-            'is_active' => true,
-        ]);
+        $residence = Residence::create($validated);
 
-        return $this->sendResponse($residence, 'Residence created successfully');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Residence created successfully',
+            'data' => $residence
+        ], 201);
     }
 
-    /**
-     * Update the specified residence.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Residence  $residence
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(Request $request, Residence $residence)
+    public function update(Request $request, $id)
     {
-        // Check if user is the provider
-        if ($request->user()->id !== $residence->provider_id) {
-            return $this->sendForbiddenError('You are not authorized to update this residence');
+        $residence = Residence::findOrFail($id);
+        
+        // Check if user is authorized to update this residence
+        if ($residence->provider_id !== Auth::id()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
         }
 
-        $validator = Validator::make($request->all(), [
-            'category_id' => 'sometimes|required|exists:categories,id',
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'type' => 'sometimes|required|string|in:apartment,dormitory,house',
-            'price' => 'sometimes|required|numeric|min:0',
-            'price_period' => 'sometimes|required|string|in:day,week,month,year',
-            'address' => 'sometimes|required|string|max:255',
-            'city' => 'sometimes|required|string|max:255',
-            'province' => 'sometimes|required|string|max:255',
-            'latitude' => 'sometimes|required|numeric',
-            'longitude' => 'sometimes|required|numeric',
-            'facilities' => 'sometimes|required|array',
-            'rules' => 'sometimes|required|array',
-            'images' => 'sometimes|required|array|min:1',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'total_rooms' => 'sometimes|required|integer|min:1',
-            'available_rooms' => 'sometimes|required|integer|min:0',
-            'gender_type' => 'sometimes|required|string|in:male,female,mixed',
-            'available_from' => 'sometimes|required|date',
-            'is_active' => 'sometimes|required|boolean',
+        $input = $request->all();
+        // Convert string input to array if needed
+        if (isset($input['facilities']) && is_string($input['facilities'])) {
+            $input['facilities'] = array_filter(array_map('trim', explode(',', $input['facilities'])));
+        }
+        if (isset($input['rules']) && is_string($input['rules'])) {
+            $input['rules'] = array_filter(array_map('trim', explode(',', $input['rules'])));
+        }
+
+        $validator = Validator::make($input, [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            // Batasi value type hanya pada value yang diizinkan
+            'type' => 'required|string|in:apartment,kost,villa,rumah,lainnya',
+            'price' => 'required|numeric|min:0',
+            'price_period' => 'required|string',
+            'address' => 'required|string',
+            'city' => 'required|string',
+            'province' => 'required|string',
+            'facilities' => 'required|array',
+            'rules' => 'required|array',
+            'total_rooms' => 'required|integer|min:1',
+            'available_rooms' => 'required|integer|min:0',
+            'gender_type' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
-            return $this->sendValidationError($validator->errors()->toArray());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // Handle image uploads if provided
+        $validated = $validator->validated();
+        $validated['slug'] = Str::slug($validated['title']);
+
+        // Handle image uploads
         if ($request->hasFile('images')) {
             // Delete old images
-            foreach ($residence->images as $image) {
-                Storage::delete($image);
+            if ($residence->images) {
+                foreach ($residence->images as $oldImage) {
+                    Storage::disk('public')->delete($oldImage);
+                }
             }
 
             $images = [];
@@ -189,62 +265,82 @@ class ResidenceController extends BaseController
                 $path = $image->store('residences', 'public');
                 $images[] = $path;
             }
-            $residence->images = $images;
+            $validated['images'] = $images;
         }
 
-        // Update other fields
-        $residence->fill($request->only([
-            'category_id',
-            'title',
-            'description',
-            'type',
-            'price',
-            'price_period',
-            'address',
-            'city',
-            'province',
-            'latitude',
-            'longitude',
-            'facilities',
-            'rules',
-            'total_rooms',
-            'available_rooms',
-            'gender_type',
-            'available_from',
-            'is_active',
-        ]));
+        $residence->update($validated);
 
-        // Update slug if title changed
-        if ($request->has('title')) {
-            $residence->slug = Str::slug($request->title);
-        }
-
-        $residence->save();
-
-        return $this->sendResponse($residence, 'Residence updated successfully');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Residence updated successfully',
+            'data' => $residence
+        ]);
     }
 
-    /**
-     * Remove the specified residence.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Residence  $residence
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(Request $request, Residence $residence)
+    public function destroy($id)
     {
-        // Check if user is the provider
-        if ($request->user()->id !== $residence->provider_id) {
-            return $this->sendForbiddenError('You are not authorized to delete this residence');
+        $residence = Residence::findOrFail($id);
+        
+        if ($residence->provider_id !== Auth::id()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
         }
 
-        // Delete images
-        foreach ($residence->images as $image) {
-            Storage::delete($image);
+        // Delete images if any
+        if ($residence->images) {
+            foreach ($residence->images as $image) {
+                Storage::disk('public')->delete($image);
+            }
         }
 
         $residence->delete();
 
-        return $this->sendResponse(null, 'Residence deleted successfully');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Residence deleted successfully'
+        ]);
     }
-} 
+
+    public function getCities()
+    {
+        $cities = Residence::where('is_active', 1)
+            ->distinct()
+            ->orderBy('city')
+            ->pluck('city');
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $cities
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+        
+        if (!$query) {
+            return response()->json([
+                'status' => 'success',
+                'data' => []
+            ]);
+        }
+
+        $residences = Residence::where('is_active', 1)
+            ->where('available_rooms', '>', 0)
+            ->where(function($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('city', 'like', "%{$query}%")
+                  ->orWhere('address', 'like', "%{$query}%");
+            })
+            ->select('id', 'title', 'slug', 'city', 'price', 'price_period')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $residences
+        ]);
+    }
+}

@@ -10,7 +10,6 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\BookmarkController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\TransactionController;
 
 /*
@@ -33,8 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Residence routes
     Route::get('/residences', [ResidenceController::class, 'index']);
     Route::get('/residences/{residence}', [ResidenceController::class, 'show']);
-    Route::post('/residences', [ResidenceController::class, 'store'])->middleware('role:provider');
-    Route::put('/residences/{residence}', [ResidenceController::class, 'update'])->middleware('role:provider');
+    Route::post('/residences', [ResidenceController::class, 'store']);
+    Route::put('/residences/{residence}', [ResidenceController::class, 'update']);
+    Route::patch('/residences/{residence}', [ResidenceController::class, 'update']);
     Route::delete('/residences/{residence}', [ResidenceController::class, 'destroy'])->middleware('role:provider');
 
     // Activity routes
@@ -71,11 +71,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
-
-    // Discount routes
-    Route::post('/discounts/check', [DiscountController::class, 'check']);
-
-    // Payment routes
-    Route::get('/payments/bank-accounts', [TransactionController::class, 'getBankAccounts']);
-    Route::get('/payments/{transaction}/status', [TransactionController::class, 'checkPaymentStatus']);
-}); 
+});

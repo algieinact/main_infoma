@@ -82,6 +82,8 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Diskon</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Aksi</th>
                         </tr>
                     </thead>
@@ -121,6 +123,33 @@
                                     {{ $activity->is_active ? 'Aktif' : 'Tidak Aktif' }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                @php
+                                    $activeVoucher = $activity->vouchers()
+                                        ->where('is_active', true)
+                                        ->where('start_date', '<=', now())
+                                        ->where('end_date', '>=', now())
+                                        ->where(function($q) {
+                                            $q->whereNull('usage_limit')
+                                              ->orWhereRaw('used_count < usage_limit');
+                                        })
+                                        ->first();
+                                @endphp
+                                @if($activeVoucher)
+                                    <div class="text-green-600 font-medium">
+                                        @if($activeVoucher->discount_type === 'percentage')
+                                            {{ $activeVoucher->discount_value }}%
+                                        @else
+                                            Rp {{ number_format($activeVoucher->discount_value, 0, ',', '.') }}
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $activeVoucher->code }}
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">Tidak ada diskon</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
 
@@ -155,6 +184,8 @@
     </div>
 </div>
 @endsection
+
+
 
 
 

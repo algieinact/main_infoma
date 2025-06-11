@@ -13,6 +13,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProviderDashboardController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProviderDiscountController;
+use App\Http\Controllers\Provider\VoucherController;
+use App\Http\Controllers\ReviewController;
 
 
 // Authentication Routes
@@ -43,6 +45,9 @@ Route::get('/activities', [ActivityController::class, 'index'])->name('activitie
 Route::get('/activities/{slug}', [ActivityController::class, 'show'])->name('activities.show');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// Review Route
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {
@@ -124,6 +129,15 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::put('/discounts/{discount}', [ProviderDiscountController::class, 'update'])->name('discounts.update');
     Route::delete('/discounts/{discount}', [ProviderDiscountController::class, 'destroy'])->name('discounts.destroy');
     Route::get('/discounts/get-items', [ProviderDiscountController::class, 'getItems'])->name('discounts.get-items');
+
+    // Voucher Management
+    Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+    Route::get('/vouchers/create', [VoucherController::class, 'create'])->name('vouchers.create');
+    Route::post('/vouchers', [VoucherController::class, 'store'])->name('vouchers.store');
+    Route::get('/vouchers/{voucher}/edit', [VoucherController::class, 'edit'])->name('vouchers.edit');
+    Route::put('/vouchers/{voucher}', [VoucherController::class, 'update'])->name('vouchers.update');
+    Route::delete('/vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
+    Route::patch('/vouchers/{voucher}/toggle-status', [VoucherController::class, 'toggleStatus'])->name('vouchers.toggle-status');
 });
 
 // Admin Routes

@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Discount;
 use App\Models\Residence;
 use App\Models\Transaction;
+use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -315,43 +316,35 @@ class BookingController extends BaseController
 
     private function applyDiscount($code, $bookable, $amount)
     {
-        $discount = Discount::where('code', $code)
-            ->where('is_active', 1)
+        $voucher = Voucher::where('code', $code)
+            ->where('discountable_type', get_class($bookable))
+            ->where('discountable_id', $bookable->id)
+            ->where('is_active', true)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
-            ->where('discountable_id', $bookable->id)
-            ->where('discountable_type', get_class($bookable))
+            ->where(function ($query) {
+                $query->whereNull('usage_limit')
+                    ->orWhereRaw('used_count < usage_limit');
+            })
             ->first();
 
-        if (!$discount) {
+        if (!$voucher) {
             return null;
         }
 
-        // Check usage limit
-        if ($discount->usage_limit && $discount->used_count >= $discount->usage_limit) {
-            return null;
-        }
-
-        // Check minimum amount
-        if ($discount->min_amount && $amount < $discount->min_amount) {
+        // Check minimum purchase
+        if ($voucher->min_purchase && $amount < $voucher->min_purchase) {
             return null;
         }
 
         // Calculate discount amount
-        if ($discount->type === 'percentage') {
-            $discountAmount = ($amount * $discount->value) / 100;
-            if ($discount->max_discount) {
-                $discountAmount = min($discountAmount, $discount->max_discount);
-            }
-        } else {
-            $discountAmount = $discount->value;
-        }
+        $discountAmount = $voucher->calculateDiscount($amount);
 
-        // Update usage count
-        $discount->increment('used_count');
+        // Update voucher usage
+        $voucher->incrementUsage();
 
         return [
-            'discount' => $discount,
+            'voucher' => $voucher,
             'amount' => $discountAmount
         ];
     }

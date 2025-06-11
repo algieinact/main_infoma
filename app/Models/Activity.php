@@ -67,6 +67,11 @@ class Activity extends Model
         return $this->morphMany(Discount::class, 'discountable');
     }
 
+    public function vouchers()
+    {
+        return $this->morphMany(\App\Models\Voucher::class, 'discountable');
+    }
+
     public function userActivities(): MorphMany
     {
         return $this->morphMany(UserActivity::class, 'activityable');

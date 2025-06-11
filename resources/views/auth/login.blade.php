@@ -45,8 +45,11 @@
                             <i class="fas fa-envelope mr-2 text-blue-500"></i>Email
                         </label>
                         <input id="email" name="email" type="email" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white @error('email') border-red-500 @enderror"
                             placeholder="Masukkan email Anda">
+                        @error('email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Password Field -->
@@ -56,13 +59,16 @@
                         </label>
                         <div class="relative">
                             <input id="password" name="password" type="password" required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white pr-12"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white pr-12 @error('password') border-red-500 @enderror"
                                 placeholder="Masukkan password Anda">
                             <button type="button" onclick="togglePassword()"
                                 class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i id="toggleIcon" class="fas fa-eye"></i>
                             </button>
                         </div>
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Remember Me & Forgot Password -->

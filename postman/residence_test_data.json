@@ -1,0 +1,250 @@
+{
+    "create_residence": {
+        "title": "Modern Apartment in Jakarta",
+        "description": "A beautiful modern apartment located in the heart of Jakarta. Perfect for students and young professionals.",
+        "type": "apartment",
+        "price": 2500000,
+        "price_period": "month",
+        "address": "Jl. Sudirman No. 123",
+        "city": "Jakarta",
+        "province": "DKI Jakarta",
+        "facilities": [
+            "wifi",
+            "ac",
+            "parking",
+            "security",
+            "laundry",
+            "gym",
+            "swimming_pool"
+        ],
+        "rules": [
+            "no_smoking",
+            "no_pets",
+            "quiet_hours",
+            "no_parties",
+            "guest_curfew"
+        ],
+        "total_rooms": 20,
+        "available_rooms": 15,
+        "gender_type": "male",
+        "category_id": 1
+    },
+    "update_residence": {
+        "title": "Updated Modern Apartment in Jakarta",
+        "description": "An updated beautiful modern apartment located in the heart of Jakarta. Perfect for students and young professionals.",
+        "type": "apartment",
+        "price": 2750000,
+        "price_period": "month",
+        "address": "Jl. Sudirman No. 123",
+        "city": "Jakarta",
+        "province": "DKI Jakarta",
+        "facilities": [
+            "wifi",
+            "ac",
+            "parking",
+            "security",
+            "laundry",
+            "gym",
+            "swimming_pool",
+            "study_room"
+        ],
+        "rules": [
+            "no_smoking",
+            "no_pets",
+            "quiet_hours",
+            "no_parties",
+            "guest_curfew",
+            "clean_room"
+        ],
+        "total_rooms": 20,
+        "available_rooms": 12,
+        "gender_type": "male",
+        "category_id": 1
+    },
+    "search_queries": [
+        {
+            "name": "Search by title",
+            "query": "Modern Apartment"
+        },
+        {
+            "name": "Search by city",
+            "query": "Jakarta"
+        },
+        {
+            "name": "Search by address",
+            "query": "Sudirman"
+        }
+    ],
+    "filter_parameters": {
+        "category": 1,
+        "type": "apartment",
+        "gender_type": "male",
+        "city": "Jakarta",
+        "min_price": 2000000,
+        "max_price": 3000000,
+        "sort": "price_low"
+    },
+    "expected_responses": {
+        "create_success": {
+            "status": "success",
+            "message": "Residence created successfully",
+            "data": {
+                "title": "Modern Apartment in Jakarta",
+                "type": "apartment",
+                "price": 2500000,
+                "price_period": "month",
+                "city": "Jakarta"
+            }
+        },
+        "update_success": {
+            "status": "success",
+            "message": "Residence updated successfully",
+            "data": {
+                "title": "Updated Modern Apartment in Jakarta",
+                "type": "apartment",
+                "price": 2750000,
+                "price_period": "month",
+                "city": "Jakarta"
+            }
+        },
+        "delete_success": {
+            "status": "success",
+            "message": "Residence deleted successfully"
+        },
+        "list_success": {
+            "status": "success",
+            "data": {
+                "data": [],
+                "current_page": 1,
+                "per_page": 12,
+                "total": 0
+            }
+        },
+        "detail_success": {
+            "status": "success",
+            "data": {
+                "residence": {
+                    "id": 1,
+                    "title": "Modern Apartment in Jakarta",
+                    "type": "apartment",
+                    "price": 2500000,
+                    "price_period": "month",
+                    "city": "Jakarta"
+                },
+                "similar_residences": [],
+                "average_rating": 0
+            }
+        }
+    },
+    "error_responses": {
+        "validation_error": {
+            "status": "error",
+            "message": "Validation failed",
+            "errors": {
+                "title": ["The title field is required."],
+                "description": ["The description field is required."],
+                "type": ["The type field is required."],
+                "price": ["The price field is required."],
+                "price_period": ["The price period field is required."],
+                "address": ["The address field is required."],
+                "city": ["The city field is required."],
+                "province": ["The province field is required."],
+                "facilities": ["The facilities field is required."],
+                "rules": ["The rules field is required."],
+                "total_rooms": ["The total rooms field is required."],
+                "available_rooms": ["The available rooms field is required."],
+                "gender_type": ["The gender type field is required."],
+                "category_id": ["The category id field is required."]
+            }
+        },
+        "unauthorized": {
+            "status": "error",
+            "message": "Unauthorized"
+        },
+        "not_found": {
+            "status": "error",
+            "message": "Residence not found"
+        }
+    },
+    "test_cases": {
+        "create_residence": [
+            {
+                "name": "Create with valid data",
+                "data": "create_residence",
+                "expected_status": 201,
+                "expected_response": "create_success"
+            },
+            {
+                "name": "Create with missing required fields",
+                "data": {},
+                "expected_status": 422,
+                "expected_response": "validation_error"
+            },
+            {
+                "name": "Create with invalid price",
+                "data": {
+                    "title": "Test Residence",
+                    "price": -1000
+                },
+                "expected_status": 422,
+                "expected_response": "validation_error"
+            }
+        ],
+        "update_residence": [
+            {
+                "name": "Update with valid data",
+                "data": "update_residence",
+                "expected_status": 200,
+                "expected_response": "update_success"
+            },
+            {
+                "name": "Update non-existent residence",
+                "data": "update_residence",
+                "id": 999,
+                "expected_status": 404,
+                "expected_response": "not_found"
+            }
+        ],
+        "delete_residence": [
+            {
+                "name": "Delete existing residence",
+                "id": 1,
+                "expected_status": 200,
+                "expected_response": "delete_success"
+            },
+            {
+                "name": "Delete non-existent residence",
+                "id": 999,
+                "expected_status": 404,
+                "expected_response": "not_found"
+            }
+        ],
+        "list_residences": [
+            {
+                "name": "List all residences",
+                "expected_status": 200,
+                "expected_response": "list_success"
+            },
+            {
+                "name": "List with filters",
+                "filters": "filter_parameters",
+                "expected_status": 200,
+                "expected_response": "list_success"
+            }
+        ],
+        "search_residences": [
+            {
+                "name": "Search by title",
+                "query": "Modern",
+                "expected_status": 200,
+                "expected_response": "list_success"
+            },
+            {
+                "name": "Search by city",
+                "query": "Jakarta",
+                "expected_status": 200,
+                "expected_response": "list_success"
+            }
+        ]
+    }
+} 

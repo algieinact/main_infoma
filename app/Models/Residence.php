@@ -66,6 +66,11 @@ class Residence extends Model
         return $this->morphMany(Discount::class, 'discountable');
     }
 
+    public function vouchers()
+    {
+        return $this->morphMany(\App\Models\Voucher::class, 'discountable');
+    }
+
     public function userActivities(): MorphMany
     {
         return $this->morphMany(UserActivity::class, 'activityable');
@@ -132,5 +137,10 @@ class Residence extends Model
     public function isBookmarkedBy(User $user)
     {
         return $this->bookmarks()->where('user_id', $user->id)->exists();
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'id'; // Ganti ke 'slug' jika ingin pakai slug
     }
 }

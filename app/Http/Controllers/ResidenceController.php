@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class ResidenceController extends Controller
 {
@@ -86,10 +87,15 @@ class ResidenceController extends Controller
 
     public function show($slug)
     {
-        $residence = Residence::with(['provider', 'category', 'reviews.user'])
-            ->where('slug', $slug)
-            ->where('is_active', 1)
-            ->firstOrFail();
+        $residence = Residence::with([
+            'provider',
+            'category',
+            'reviews' => function($q) { $q->latest(); },
+            'reviews.user'
+        ])
+        ->where('slug', $slug)
+        ->where('is_active', 1)
+        ->firstOrFail();
 
         // Log user activity
         if (Auth::check()) {
