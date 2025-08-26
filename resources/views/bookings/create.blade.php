@@ -204,24 +204,26 @@
                     </div>
                     @endif
 
-                    <!-- Discount Code -->
+                    <!-- Voucher Code -->
                     <div class="mb-8">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Discount Code (Optional)</h2>
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Voucher Code (Optional)</h2>
                         <div class="flex space-x-4">
                             <div class="flex-1">
-                                <input type="text" name="discount_code" id="discount_code" 
-                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('discount_code') border-red-500 @enderror"
-                                       placeholder="Enter discount code" value="{{ old('discount_code') }}">
-                                @error('discount_code')
+                                <input type="text" name="voucher_code" id="voucher_code" 
+                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('voucher_code') border-red-500 @enderror"
+                                       placeholder="Enter voucher code" value="{{ old('voucher_code') }}">
+                                @error('voucher_code')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <button type="button" id="checkDiscountBtn"
+                            <button type="button" id="checkVoucherBtn"
                                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Check
+                                Apply Voucher
                             </button>
                         </div>
-                        <div id="discountResult" class="mt-2 text-sm"></div>
+                        <div id="voucherResult" class="mt-2 text-sm"></div>
+                        <input type="hidden" name="voucher_id" id="voucher_id" value="">
+                        <input type="hidden" name="discount_amount" id="discount_amount" value="0">
                     </div>
 
                     <!-- Notes -->
@@ -246,9 +248,9 @@
                                     <span class="text-gray-600">Base Price:</span>
                                     <span class="font-medium" id="basePrice">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
                                 </div>
-                                <div class="flex justify-between" id="discountRow" style="display: none;">
-                                    <span class="text-gray-600">Discount:</span>
-                                    <span class="font-medium text-green-600" id="discountAmount">-Rp 0</span>
+                                <div class="flex justify-between" id="voucherDiscountRow" style="display: none;">
+                                    <span class="text-gray-600">Voucher Discount:</span>
+                                    <span class="font-medium text-green-600" id="voucherDiscountAmount">-Rp 0</span>
                                 </div>
                                 <div class="border-t border-gray-200 my-2"></div>
                                 <div class="flex justify-between">
@@ -416,62 +418,104 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Discount code handling
-    const discountCode = document.getElementById('discount_code');
-    const checkDiscountBtn = document.getElementById('checkDiscountBtn');
-    const discountResult = document.getElementById('discountResult');
-    const discountRow = document.getElementById('discountRow');
-    const discountAmount = document.getElementById('discountAmount');
+    // Voucher code handling
+    const voucherCode = document.getElementById('voucher_code');
+    const checkVoucherBtn = document.getElementById('checkVoucherBtn');
+    const voucherResult = document.getElementById('voucherResult');
+    const voucherDiscountRow = document.getElementById('voucherDiscountRow');
+    const voucherDiscountAmount = document.getElementById('voucherDiscountAmount');
     const totalAmount = document.getElementById('totalAmount');
     const basePrice = document.getElementById('basePrice');
+    const voucherId = document.getElementById('voucher_id');
+    const discountAmountInput = document.getElementById('discount_amount');
 
-    checkDiscountBtn.addEventListener('click', function() {
-        const code = discountCode.value;
+    checkVoucherBtn.addEventListener('click', function() {
+        const code = voucherCode.value.trim();
         if (!code) {
-            discountResult.innerHTML = '<p class="text-red-600">Please enter a discount code</p>';
+            voucherResult.innerHTML = '<p class="text-red-600">Please enter a voucher code</p>';
             return;
         }
 
         // Show loading state
-        checkDiscountBtn.disabled = true;
-        checkDiscountBtn.innerHTML = 'Checking...';
-        discountResult.innerHTML = '<p class="text-gray-600">Checking discount code...</p>';
+        checkVoucherBtn.disabled = true;
+        checkVoucherBtn.innerHTML = 'Checking...';
+        voucherResult.innerHTML = '<p class="text-gray-600">Checking voucher code...</p>';
 
-        // Make API call to check discount
-        fetch(`/api/bookings/check-discount`, {
+        // Get base price (remove currency formatting)
+        const basePriceValue = parseFloat(basePrice.textContent.replace(/[^0-9.-]+/g, ''));
+
+        // Make API call to validate voucher
+        fetch(`/vouchers/validate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: JSON.stringify({
-                discount_code: code,
+                code: code,
                 bookable_type: document.querySelector('input[name="bookable_type"]').value,
                 bookable_id: document.querySelector('input[name="bookable_id"]').value,
-                amount: parseFloat(basePrice.textContent.replace(/[^0-9.-]+/g, ''))
+                amount: basePriceValue
             })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.valid) {
-                discountResult.innerHTML = '<p class="text-green-600">' + data.message + '</p>';
-                discountRow.style.display = 'flex';
-                discountAmount.textContent = '-Rp ' + data.discount_amount.toLocaleString('id-ID');
-                totalAmount.textContent = 'Rp ' + data.final_amount.toLocaleString('id-ID');
+            if (data.success) {
+                voucherResult.innerHTML = '<p class="text-green-600">' + data.message + '</p>';
+                voucherDiscountRow.style.display = 'flex';
+                voucherDiscountAmount.textContent = '-Rp ' + data.data.discount_amount.toLocaleString('id-ID');
+                totalAmount.textContent = 'Rp ' + data.data.final_amount.toLocaleString('id-ID');
+                
+                // Store voucher data
+                voucherId.value = data.data.voucher_id;
+                discountAmountInput.value = data.data.discount_amount;
+                
+                // Disable voucher input after successful application
+                voucherCode.disabled = true;
+                checkVoucherBtn.disabled = true;
+                checkVoucherBtn.innerHTML = 'Applied';
+                checkVoucherBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                checkVoucherBtn.classList.add('bg-green-600', 'hover:bg-green-700');
             } else {
-                discountResult.innerHTML = '<p class="text-red-600">' + data.message + '</p>';
-                discountRow.style.display = 'none';
+                voucherResult.innerHTML = '<p class="text-red-600">' + data.message + '</p>';
+                voucherDiscountRow.style.display = 'none';
                 totalAmount.textContent = basePrice.textContent;
+                
+                // Reset voucher data
+                voucherId.value = '';
+                discountAmountInput.value = '0';
             }
         })
         .catch(error => {
-            discountResult.innerHTML = '<p class="text-red-600">Error checking discount code</p>';
+            voucherResult.innerHTML = '<p class="text-red-600">Error checking voucher code</p>';
             console.error('Error:', error);
         })
         .finally(() => {
-            checkDiscountBtn.disabled = false;
-            checkDiscountBtn.innerHTML = 'Check';
+            if (!voucherId.value) {
+                checkVoucherBtn.disabled = false;
+                checkVoucherBtn.innerHTML = 'Apply Voucher';
+            }
         });
+    });
+
+    // Allow removing voucher
+    voucherCode.addEventListener('input', function() {
+        if (this.value === '') {
+            // Reset voucher
+            voucherId.value = '';
+            discountAmountInput.value = '0';
+            voucherDiscountRow.style.display = 'none';
+            totalAmount.textContent = basePrice.textContent;
+            
+            // Re-enable voucher input
+            this.disabled = false;
+            checkVoucherBtn.disabled = false;
+            checkVoucherBtn.innerHTML = 'Apply Voucher';
+            checkVoucherBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            checkVoucherBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            
+            voucherResult.innerHTML = '';
+        }
     });
 
     // Form submission handling

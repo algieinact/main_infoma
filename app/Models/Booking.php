@@ -26,7 +26,7 @@ class Booking extends Model
         'booking_code', 'user_id', 'bookable_type', 'bookable_id', 
         'booking_data', 'files', 'status', 'booking_date', 'start_date', 
         'end_date', 'total_amount', 'discount_amount', 'final_amount', 
-        'notes', 'cancellation_reason', 'cancelled_at'
+        'voucher_id', 'notes', 'cancellation_reason', 'cancelled_at'
     ];
 
     protected $casts = [
@@ -60,6 +60,11 @@ class Booking extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function voucher(): BelongsTo
+    {
+        return $this->belongsTo(Voucher::class);
     }
 
     // Scopes

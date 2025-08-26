@@ -131,10 +131,7 @@
                         <span class="text-blue-600 font-semibold">
                             {{ $activity->is_free ? 'Gratis' : 'Rp ' . number_format($activity->price) }}
                         </span>
-                        <div class="flex items-center">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <span class="text-gray-600">{{ number_format($activity->rating, 1) }}</span>
-                        </div>
+                        <x-rating-summary :rating="$activity->rating" :totalReviews="$activity->total_reviews" size="sm" />
                     </div>
                 </div>
             </a>

@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- add favicon -->
+    <link rel="icon" href="{{ asset('images/Infoma_Branding-05.png') }}">
     <title>@yield('title', 'Infoma - Informasi Kebutuhan Mahasiswa')</title>
 
     <!-- CSRF Token -->
@@ -51,9 +53,8 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">I</span>
-                        </div>
+                        <!-- add logo infoma image -->
+                        <img src="{{ asset('images/Infoma_Branding-blue-05.png') }}" alt="Infoma Logo" class="w-8 h-8">
                         <span class="text-xl font-bold text-gray-900">Infoma</span>
                     </a>
                 </div>

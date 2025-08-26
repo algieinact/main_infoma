@@ -112,13 +112,10 @@
                         <i class="fas fa-map-marker-alt text-blue-500 mr-1"></i>
                         {{ $residence->city }}
                     </p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-blue-600 font-semibold">{{ $residence->formatted_price }}</span>
-                        <div class="flex items-center">
-                            <i class="fas fa-star text-yellow-400 mr-1"></i>
-                            <span class="text-gray-600">{{ number_format($residence->rating, 1) }}</span>
+                                            <div class="flex items-center justify-between">
+                            <span class="text-blue-600 font-semibold">{{ $residence->formatted_price }}</span>
+                            <x-rating-summary :rating="$residence->rating" :totalReviews="$residence->total_reviews" size="sm" />
                         </div>
-                    </div>
                 </div>
             </a>
         </div>

@@ -142,7 +142,7 @@
 
             <!-- Actions Card -->
             <div class="bg-white rounded-lg shadow p-6">
-                <a href="{{ route('bookings.history') }}"
+                <a href="{{ route('dashboard') }}"
                     class="block w-full text-center mb-2 px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold transition">
                     <i class="fas fa-arrow-left mr-2"></i>Kembali
                 </a>

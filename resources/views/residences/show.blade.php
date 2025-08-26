@@ -68,18 +68,8 @@
                         </svg>
                         <span>{{ $residence->address }}, {{ $residence->city }}</span>
                     </div>
-                    <div class="flex items-center mb-6">
-                        <div class="flex items-center text-yellow-400">
-                            @for($i = 1; $i <= 5; $i++) <svg
-                                class="w-5 h-5 {{ $i <= $averageRating ? 'text-yellow-400' : 'text-gray-300' }}"
-                                fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                @endfor
-                        </div>
-                        <span class="ml-2 text-gray-600">{{ number_format($averageRating, 1) }}
-                            ({{ $residence->total_reviews }} reviews)</span>
+                    <div class="mb-6">
+                        <x-rating-summary :rating="$residence->rating" :totalReviews="$residence->total_reviews" size="lg" />
                     </div>
 
                     <div class="prose max-w-none mb-8">
@@ -121,59 +111,11 @@
                     </div>
 
                     <!-- Reviews Section -->
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                        <h2 class="text-xl font-semibold mb-4">Reviews</h2>
-                        @if($residence->reviews->count() > 0)
-                        <div class="space-y-4 mb-6">
-                            @foreach($residence->reviews as $review)
-                            <div class="border-b pb-4">
-                                <div class="flex items-center mb-2">
-                                    <span class="font-semibold text-gray-900 mr-2">{{ $review->user->name }}</span>
-                                    <span class="text-yellow-400">
-                                        @for($i = 1; $i <= 5; $i++) <svg class="inline w-4 h-4" fill="currentColor"
-                                            viewBox="0 0 20 20">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
-                                            </svg>
-                                            @endfor
-                                    </span>
-                                    <span class="ml-2 text-gray-600 text-xs">{{ $review->created_at->diffForHumans() }}
-                                    </span>
-                                </div>
-                                <p class="text-gray-700">{{ $review->comment }}</p>
-                            </div>
-                            @endforeach
-                        </div>
-                        @else
-                        <p class="text-gray-600 mb-4">No reviews yet.</p>
-                        @endif
-                        @auth
-                        <form action="{{ route('reviews.store') }}" method="POST" class="space-y-4">
-                            @csrf
-                            <input type="hidden" name="reviewable_type" value="App\\Models\\Residence">
-                            <input type="hidden" name="reviewable_id" value="{{ $residence->id }}">
-                            <div>
-                                <label for="rating" class="block text-sm font-medium text-gray-700">Rating</label>
-                                <select name="rating" id="rating"
-                                    class="mt-1 block w-24 border-gray-300 rounded-md shadow-sm">
-                                    <option value="">Select</option>
-                                    @for($i = 5; $i >= 1; $i--)
-                                    <option value="{{ $i }}">{{ $i }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div>
-                                <label for="comment" class="block text-sm font-medium text-gray-700">Comment</label>
-                                <textarea name="comment" id="comment" rows="3"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
-                            </div>
-                            <button type="submit"
-                                class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                                Submit Review
-                            </button>
-                        </form>
-                        @endauth
-                    </div>
+                    <x-review-list 
+                        :reviews="$residence->reviews" 
+                        :showForm="true"
+                        reviewableType="App\Models\Residence"
+                        :reviewableId="$residence->id" />
                 </div>
             </div>
 

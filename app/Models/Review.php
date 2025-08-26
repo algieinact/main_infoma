@@ -13,12 +13,13 @@ class Review extends Model
 
     protected $fillable = [
         'user_id', 'booking_id', 'reviewable_type', 'reviewable_id',
-        'rating', 'comment', 'review_date'
+        'rating', 'comment', 'images', 'is_anonymous'
     ];
 
     protected $casts = [
-        'rating' => 'decimal:1',
-        'review_date' => 'datetime',
+        'rating' => 'integer',
+        'images' => 'array',
+        'is_anonymous' => 'boolean',
     ];
 
     // Relationships
@@ -35,5 +36,32 @@ class Review extends Model
     public function reviewable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    // Accessors
+    public function getDisplayNameAttribute()
+    {
+        if ($this->is_anonymous) {
+            return 'Anonymous User';
+        }
+        return $this->user->name;
+    }
+
+    public function getFormattedRatingAttribute()
+    {
+        return number_format($this->rating, 1);
+    }
+
+    public function getStarsAttribute()
+    {
+        $stars = '';
+        for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $this->rating) {
+                $stars .= '★';
+            } else {
+                $stars .= '☆';
+            }
+        }
+        return $stars;
     }
 }

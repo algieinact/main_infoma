@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ResidenceSeeder::class,
             ActivitySeeder::class,
+            ReviewSeeder::class,
+            VoucherSeeder::class,
             // Tambahkan seeder lain di sini jika ada
         ]);
     }

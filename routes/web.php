@@ -46,8 +46,11 @@ Route::get('/activities/{slug}', [ActivityController::class, 'show'])->name('act
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-// Review Route
+// Review Routes
+Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {
@@ -146,4 +149,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users', [DashboardController::class, 'users'])->name('users');
     Route::get('/residences', [DashboardController::class, 'residences'])->name('residences');
     Route::get('/activities', [DashboardController::class, 'activities'])->name('activities');
+});
+
+// User voucher routes
+Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::post('/vouchers/validate', [App\Http\Controllers\User\VoucherController::class, 'validateVoucher'])
+         ->name('user.vouchers.validate');
 });

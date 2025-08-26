@@ -12,10 +12,10 @@ return new class extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('booking_id')->constrained()->onDelete('cascade');
+            $table->foreignId('booking_id')->nullable()->constrained()->onDelete('cascade');
             $table->morphs('reviewable'); // residence_id or activity_id
             $table->integer('rating'); // 1-5
-            $table->text('comment')->nullable();
+            $table->text('comment');
             $table->json('images')->nullable();
             $table->boolean('is_anonymous')->default(false);
             $table->timestamps();

@@ -94,4 +94,33 @@ class Voucher extends Model
     {
         $this->increment('used_count');
     }
+
+    public function getFormattedDiscountAttribute(): string
+    {
+        if ($this->discount_type === 'percentage') {
+            return $this->discount_value . '%';
+        }
+        return 'Rp ' . number_format($this->discount_value, 0, ',', '.');
+    }
+
+    public function getStatusAttribute(): string
+    {
+        if (!$this->is_active) {
+            return 'Inactive';
+        }
+        
+        if (now() < $this->start_date) {
+            return 'Pending';
+        }
+        
+        if (now() > $this->end_date) {
+            return 'Expired';
+        }
+        
+        if ($this->usage_limit && $this->used_count >= $this->usage_limit) {
+            return 'Used Up';
+        }
+        
+        return 'Active';
+    }
 } 

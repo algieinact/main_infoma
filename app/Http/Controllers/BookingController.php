@@ -73,7 +73,9 @@ class BookingController extends BaseController
                 'bookable_type' => 'required|in:App\Models\Residence,App\Models\Activity',
                 'bookable_id' => 'required|integer',
                 'start_date' => 'required|date|after:today',
-                'discount_code' => 'nullable|string',
+                'voucher_code' => 'nullable|string',
+                'voucher_id' => 'nullable|integer',
+                'discount_amount' => 'nullable|numeric|min:0',
                 'payment_method' => 'required|in:bank_transfer,e_wallet',
             ];
 
@@ -158,12 +160,19 @@ class BookingController extends BaseController
                 }
             }
 
-            // Apply discount if provided
+            // Apply voucher discount if provided
             $discountAmount = 0;
-            if ($request->filled('discount_code')) {
-                $discount = $this->applyDiscount($request->discount_code, $bookable, $totalAmount);
-                if ($discount) {
-                    $discountAmount = $discount['amount'];
+            $voucherId = null;
+            
+            if ($request->filled('voucher_id') && $request->filled('discount_amount')) {
+                // Validate voucher
+                $voucher = Voucher::find($request->voucher_id);
+                if ($voucher && $voucher->isValid()) {
+                    $discountAmount = $request->discount_amount;
+                    $voucherId = $voucher->id;
+                    
+                    // Update voucher usage
+                    $voucher->incrementUsage();
                 }
             }
 
@@ -183,6 +192,7 @@ class BookingController extends BaseController
                 'total_amount' => $totalAmount,
                 'discount_amount' => $discountAmount,
                 'final_amount' => $finalAmount,
+                'voucher_id' => $voucherId,
                 'notes' => $request->notes,
                 'status' => Booking::STATUS_WAITING_PROVIDER_APPROVAL
             ]);

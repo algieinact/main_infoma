@@ -35,14 +35,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/residences', [ResidenceController::class, 'store']);
     Route::put('/residences/{residence}', [ResidenceController::class, 'update']);
     Route::patch('/residences/{residence}', [ResidenceController::class, 'update']);
-    Route::delete('/residences/{residence}', [ResidenceController::class, 'destroy'])->middleware('role:provider');
+    Route::delete('/residences/{residence}', [ResidenceController::class, 'destroy']);
 
     // Activity routes
     Route::get('/activities', [ActivityController::class, 'index']);
     Route::get('/activities/{activity}', [ActivityController::class, 'show']);
-    Route::post('/activities', [ActivityController::class, 'store'])->middleware('role:provider');
-    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->middleware('role:provider');
-    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->middleware('role:provider');
+    Route::post('/activities', [ActivityController::class, 'store']);
+    Route::put('/activities/{activity}', [ActivityController::class, 'update']);
+    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy']);
 
     // Booking routes
     Route::get('/bookings', [BookingController::class, 'index']);
