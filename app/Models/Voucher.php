@@ -75,7 +75,23 @@ class Voucher extends Model
 
     public function calculateDiscount(float $amount): float
     {
+        \Log::info('Calculating voucher discount', [
+            'voucher_id' => $this->id,
+            'voucher_code' => $this->code,
+            'discount_type' => $this->discount_type,
+            'discount_value' => $this->discount_value,
+            'amount' => $amount,
+            'min_purchase' => $this->min_purchase,
+            'max_discount' => $this->max_discount,
+            'is_valid' => $this->isValid()
+        ]);
+
         if (!$this->isValid() || $amount < $this->min_purchase) {
+            \Log::info('Voucher discount calculation failed', [
+                'reason' => !$this->isValid() ? 'voucher_invalid' : 'amount_below_minimum',
+                'amount' => $amount,
+                'min_purchase' => $this->min_purchase
+            ]);
             return 0;
         }
 
@@ -86,6 +102,12 @@ class Voucher extends Model
         if ($this->max_discount) {
             $discount = min($discount, $this->max_discount);
         }
+
+        \Log::info('Voucher discount calculated', [
+            'raw_discount' => $this->discount_type === 'percentage' ? ($amount * $this->discount_value / 100) : $this->discount_value,
+            'final_discount' => $discount,
+            'capped_by_max' => $this->max_discount && $discount > $this->max_discount
+        ]);
 
         return $discount;
     }

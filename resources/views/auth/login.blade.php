@@ -27,8 +27,8 @@
             <!-- Header -->
             <div class="text-center">
                 <div
-                    class="mx-auto h-20 w-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
-                    <i class="fas fa-home text-white text-2xl"></i>
+                    class="mx-auto flex items-center justify-center mb-4">
+                    <img src="{{ asset('images/Infoma_Branding-blue-05.png') }}" alt="Infoma Logo" class="w-16 h-16">
                 </div>
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">Selamat Datang di Infoma</h2>
                 <p class="text-gray-600">Masuk ke akun Anda untuk melanjutkan</p>
@@ -89,7 +89,7 @@
                     </div>
 
                     <!-- Role Selection -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             <i class="fas fa-user-tag mr-2 text-blue-500"></i>Masuk sebagai
                         </label>
@@ -111,7 +111,7 @@
                                 </div>
                             </label>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Submit Button -->
                     <div>

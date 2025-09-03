@@ -64,7 +64,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @foreach($recentResidences->take(9) as $residence)
-            <a href="{{ route('residences.show', $residence) }}" class="block group">
+            <a href="{{ route('residences.show', $residence->slug) }}" class="block group">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
                     @if($residence->images && count($residence->images) > 0)
                     <img src="{{ asset('storage/' . $residence->images[0]) }}" alt="{{ $residence->title }}"
@@ -104,7 +104,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @foreach($recentActivities->take(9) as $activity)
-            <a href="{{ route('activities.show', $activity) }}" class="block group">
+            <a href="{{ route('activities.show', $activity->slug) }}" class="block group">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
                     @if($activity->images && count($activity->images) > 0)
                     <img src="{{ asset('storage/' . $activity->images[0]) }}" alt="{{ $activity->title }}"

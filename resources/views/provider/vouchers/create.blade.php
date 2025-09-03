@@ -10,6 +10,22 @@
     </div>
 
     <div class="bg-white shadow-md rounded-lg p-6">
+        @if(session('error'))
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+        
+        @if($errors->any())
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
         <form action="{{ route('provider.vouchers.store') }}" method="POST" class="space-y-6">
             @csrf
             
@@ -178,12 +194,23 @@ document.addEventListener('DOMContentLoaded', function() {
             discountPrefix.textContent = '%';
             discountValueInput.placeholder = '0';
             discountValueInput.step = '0.01';
+            discountValueInput.max = '100';
             maxDiscountInput.parentElement.style.display = 'block';
         } else {
             discountPrefix.textContent = 'Rp';
             discountValueInput.placeholder = '0';
             discountValueInput.step = '1000';
+            discountValueInput.max = '';
             maxDiscountInput.parentElement.style.display = 'none';
+        }
+    });
+    
+    // Validate discount value on input
+    discountValueInput.addEventListener('input', function() {
+        if (discountTypeSelect.value === 'percentage' && this.value > 100) {
+            this.setCustomValidity('Diskon persentase tidak boleh lebih dari 100%');
+        } else {
+            this.setCustomValidity('');
         }
     });
     
@@ -214,8 +241,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle start date change
     document.getElementById('start_date').addEventListener('change', function() {
-        document.getElementById('end_date').min = this.value;
+        const startDate = this.value;
+        const endDateInput = document.getElementById('end_date');
+        
+        if (startDate) {
+            endDateInput.min = startDate;
+            // If end date is before start date, clear it
+            if (endDateInput.value && endDateInput.value <= startDate) {
+                endDateInput.value = '';
+            }
+        }
     });
+    
+    // Initialize end date minimum when page loads
+    const startDateValue = document.getElementById('start_date').value;
+    if (startDateValue) {
+        document.getElementById('end_date').min = startDateValue;
+    }
 });
 </script>
 @endsection 

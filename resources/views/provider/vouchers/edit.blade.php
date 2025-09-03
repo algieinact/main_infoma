@@ -7,9 +7,30 @@
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Edit Voucher</h1>
         <p class="mt-2 text-gray-600">Edit voucher "{{ $voucher->code }}"</p>
+        @if($voucher->used_count > 0)
+            <div class="mt-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                <strong>Perhatian:</strong> Voucher ini sudah digunakan {{ $voucher->used_count }} kali dan tidak dapat diubah.
+            </div>
+        @endif
     </div>
 
     <div class="bg-white shadow-md rounded-lg p-6">
+        @if(session('error'))
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+        
+        @if($errors->any())
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
         <form action="{{ route('provider.vouchers.update', $voucher) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
@@ -177,12 +198,23 @@ document.addEventListener('DOMContentLoaded', function() {
             discountPrefix.textContent = '%';
             discountValueInput.placeholder = '0';
             discountValueInput.step = '0.01';
+            discountValueInput.max = '100';
             maxDiscountInput.parentElement.style.display = 'block';
         } else {
             discountPrefix.textContent = 'Rp';
             discountValueInput.placeholder = '0';
             discountValueInput.step = '1000';
+            discountValueInput.max = '';
             maxDiscountInput.parentElement.style.display = 'none';
+        }
+    });
+    
+    // Validate discount value on input
+    discountValueInput.addEventListener('input', function() {
+        if (discountTypeSelect.value === 'percentage' && this.value > 100) {
+            this.setCustomValidity('Diskon persentase tidak boleh lebih dari 100%');
+        } else {
+            this.setCustomValidity('');
         }
     });
     

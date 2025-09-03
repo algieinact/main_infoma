@@ -26,32 +26,33 @@
     <nav class="bg-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <div class="text-2xl font-bold text-primary">
-                        <i class="fas fa-home mr-2"></i>Infoma
+                <div class=" items-center">
+                    <div class="text-2xl font-bold text-black flex items-center gap-2">
+                        <img src="{{ asset('images/Infoma_Branding-blue-05.png') }}" alt="Infoma Logo" class="w-8 h-8">
+                        <span>Infoma</span>
                     </div>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="#home"
-                            class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Beranda</a>
+                            class="text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Beranda</a>
                         <a href="#features"
-                            class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Fitur</a>
+                            class="text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Fitur</a>
                         <a href="#how-it-works"
-                            class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Cara
+                            class="text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Cara
                             Kerja</a>
                         <a href="#contact"
-                            class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Kontak</a>
+                            class="text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Kontak</a>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('login') }}" class="text-primary hover:text-secondary font-medium">Masuk</a>
+                    <a href="{{ route('login') }}" class="text-blue-800 hover:text-secondary font-medium">Masuk</a>
                     <a href="{{ route('register') }}"
-                        class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors">Daftar</a>
+                        class="bg-blue-800 hover:bg-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors">Daftar</a>
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-primary">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-blue-800">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -61,14 +62,14 @@
         <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="#home"
-                    class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium">Beranda</a>
+                    class="block text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-base font-medium">Beranda</a>
                 <a href="#features"
-                    class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium">Fitur</a>
+                    class="block text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-base font-medium">Fitur</a>
                 <a href="#how-it-works"
-                    class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium">Cara
+                    class="block text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-base font-medium">Cara
                     Kerja</a>
                 <a href="#contact"
-                    class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium">Kontak</a>
+                    class="block text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-base font-medium">Kontak</a>
             </div>
         </div>
     </nav>
@@ -79,8 +80,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="text-center lg:text-left">
                     <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                        Temukan <span class="text-primary">Residence</span> dan
-                        <span class="text-primary">Kegiatan Kampus</span> Terbaik
+                        Temukan <span class="text-blue-900">Residence</span> dan
+                        <span class="text-blue-800">Kegiatan Kampus</span> Terbaik
                     </h1>
                     <p class="text-xl text-gray-600 mb-8 leading-relaxed">
                         Platform lengkap untuk mahasiswa dalam mencari kost, kontrakan, serta informasi kegiatan kampus
@@ -88,18 +89,18 @@
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                         <a href="{{ route('register') }}"
-                            class="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            class="bg-blue-800 hover:bg-secondary text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                             <i class="fas fa-rocket mr-2"></i>Mulai Sekarang
                         </a>
                         <a href="#features"
-                            class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
+                            class="border-2 border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
                             <i class="fas fa-play mr-2"></i>Pelajari Lebih Lanjut
                         </a>
                     </div>
                 </div>
                 <div class="text-center">
                     <div class="relative">
-                        <div class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 shadow-2xl">
+                        <div class="bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl p-8 shadow-2xl">
                             <div class="grid grid-cols-2 gap-4 text-white">
                                 <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
                                     <i class="fas fa-home text-3xl mb-2"></i>
@@ -142,8 +143,8 @@
                 <!-- Feature 1 -->
                 <div
                     class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-home text-primary text-2xl"></i>
+                    <div class="bg-blue-800 bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-home text-blue-800 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Residence</h3>
                     <p class="text-gray-600 mb-4">Cari kost dan kontrakan dengan mudah. Booking online dengan sistem
@@ -158,8 +159,8 @@
                 <!-- Feature 2 -->
                 <div
                     class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-calendar-alt text-primary text-2xl"></i>
+                    <div class="bg-blue-800 bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-calendar-alt text-blue-800 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Kegiatan Kampus</h3>
                     <p class="text-gray-600 mb-4">Temukan seminar, webinar, mentoring, lomba, dan kegiatan kampus
@@ -174,8 +175,8 @@
                 <!-- Feature 3 -->
                 <div
                     class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-credit-card text-primary text-2xl"></i>
+                    <div class="bg-blue-800 bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-credit-card text-blue-800 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Pembayaran Aman</h3>
                     <p class="text-gray-600 mb-4">Sistem pembayaran terintegrasi dengan berbagai metode pembayaran.</p>
@@ -189,8 +190,8 @@
                 <!-- Feature 4 -->
                 <div
                     class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-bookmark text-primary text-2xl"></i>
+                    <div class="bg-blue-800 bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bookmark text-blue-800 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Bookmark</h3>
                     <p class="text-gray-600 mb-4">Simpan Residence dan kegiatan favorit untuk akses cepat.</p>
@@ -204,8 +205,8 @@
                 <!-- Feature 5 -->
                 <div
                     class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-percent text-primary text-2xl"></i>
+                    <div class="bg-blue-800 bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-percent text-blue-800 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Diskon & Promo</h3>
                     <p class="text-gray-600 mb-4">Dapatkan berbagai diskon menarik dari penyedia layanan.</p>
@@ -219,8 +220,8 @@
                 <!-- Feature 6 -->
                 <div
                     class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-headset text-primary text-2xl"></i>
+                    <div class="bg-blue-800 bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-headset text-blue-800 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Customer Support</h3>
                     <p class="text-gray-600 mb-4">Tim support siap membantu 24/7 untuk menyelesaikan masalah Anda.</p>
@@ -245,7 +246,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="text-center">
                     <div
-                        class="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        class="bg-blue-800 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                         1</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Daftar Akun</h3>
                     <p class="text-gray-600">Buat akun gratis dan lengkapi profil Anda untuk pengalaman yang lebih
@@ -253,7 +254,7 @@
                 </div>
                 <div class="text-center">
                     <div
-                        class="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        class="bg-blue-800 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                         2</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Cari & Pilih</h3>
                     <p class="text-gray-600">Jelajahi berbagai pilihan Residence dan kegiatan sesuai kebutuhan
@@ -261,14 +262,14 @@
                 </div>
                 <div class="text-center">
                     <div
-                        class="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        class="bg-blue-800 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                         3</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Booking & Bayar</h3>
                     <p class="text-gray-600">Lakukan booking dan pembayaran dengan aman melalui sistem terintegrasi.</p>
                 </div>
                 <div class="text-center">
                     <div
-                        class="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        class="bg-blue-800 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                         4</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Nikmati Layanan</h3>
                     <p class="text-gray-600">Nikmati Residence atau ikuti kegiatan sesuai dengan yang Anda pesan.
@@ -279,18 +280,18 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-primary to-secondary">
+    <section class="py-20 bg-gradient-to-r from-blue-500 to-blue-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Siap Memulai Pengalaman Baru?</h2>
             <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">Bergabunglah dengan ribuan mahasiswa yang sudah
                 merasakan kemudahan Infoma</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('register') }}"
-                    class="bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
+                    class="bg-white text-blue-800 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-user-plus mr-2"></i>Daftar Gratis
                 </a>
                 <a href="#"
-                    class="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
+                    class="border-2 border-white text-white hover:bg-white hover:text-blue-800 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
                     <i class="fas fa-phone mr-2"></i>Hubungi Kami
                 </a>
             </div>
@@ -302,19 +303,20 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-1 md:col-span-2">
-                    <div class="text-2xl font-bold text-primary mb-4">
-                        <i class="fas fa-home mr-2"></i>Infoma
+                    <div class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <img src="{{ asset('images/Infoma_Branding-05.png') }}" alt="Infoma Logo" class="w-6 h-6">
+                        Infoma
                     </div>
                     <p class="text-gray-400 mb-6 max-w-md">Platform terpercaya untuk mahasiswa dalam mencari tempat
                         tinggal dan kegiatan kampus. Memudahkan kehidupan mahasiswa dengan teknologi modern.</p>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i
+                        <a href="#" class="text-gray-400 hover:text-blue-800 transition-colors"><i
                                 class="fab fa-facebook text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i
+                        <a href="#" class="text-gray-400 hover:text-blue-800 transition-colors"><i
                                 class="fab fa-twitter text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i
+                        <a href="#" class="text-gray-400 hover:text-blue-800 transition-colors"><i
                                 class="fab fa-instagram text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i
+                        <a href="#" class="text-gray-400 hover:text-blue-800 transition-colors"><i
                                 class="fab fa-linkedin text-xl"></i></a>
                     </div>
                 </div>

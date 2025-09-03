@@ -304,25 +304,53 @@ class BookingController extends BaseController
     }
 
     private function calculateResidenceAmount($residence, $startDate, $endDate)
-    {
-        $days = $startDate->diffInDays($endDate);
-        
-        switch ($residence->price_period) {
-            case 'daily':
-                return $residence->price * $days;
-            case 'weekly':
-                $weeks = ceil($days / 7);
-                return $residence->price * $weeks;
-            case 'monthly':
-                $months = ceil($days / 30);
-                return $residence->price * $months;
-            case 'yearly':
-                $years = ceil($days / 365);
-                return $residence->price * $years;
-            default:
-                return $residence->price;
-        }
+{
+    $days = $startDate->diffInDays($endDate);
+    
+    \Log::info('Calculating residence amount', [
+        'residence_id' => $residence->id,
+        'price' => $residence->price,
+        'price_period' => $residence->price_period,
+        'start_date' => $startDate->format('Y-m-d'),
+        'end_date' => $endDate->format('Y-m-d'),
+        'days' => $days
+    ]);
+    
+    switch ($residence->price_period) {
+        case 'daily':
+            $amount = $residence->price * $days;
+            break;
+        case 'weekly':
+            $weeks = ceil($days / 7);
+            $amount = $residence->price * $weeks;
+            break;
+        case 'monthly':
+            $months = ceil($days / 30);
+            $amount = $residence->price * $months;
+            break;
+        case 'yearly':
+            $years = ceil($days / 365);
+            $amount = $residence->price * $years;
+            break;
+        default:
+            $amount = $residence->price;
     }
+    
+    \Log::info('Calculated residence amount', [
+        'final_amount' => $amount,
+        'calculation_details' => [
+            'price_period' => $residence->price_period,
+            'base_price' => $residence->price,
+            'days' => $days,
+            'units' => $residence->price_period === 'monthly' ? ceil($days / 30) : null,
+            'formula' => $residence->price_period === 'monthly' 
+                ? "price ({$residence->price}) * months (" . ceil($days / 30) . ") = {$amount}"
+                : 'other calculation'
+        ]
+    ]);
+    
+    return $amount;
+}
 
     private function applyDiscount($code, $bookable, $amount)
     {

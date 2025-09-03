@@ -152,7 +152,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 // User voucher routes
-Route::middleware(['auth', 'role:user'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('/vouchers/validate', [App\Http\Controllers\User\VoucherController::class, 'validateVoucher'])
          ->name('user.vouchers.validate');
+    Route::get('/vouchers/available', [App\Http\Controllers\User\VoucherController::class, 'getAvailableVouchers'])
+         ->name('user.vouchers.available');
 });

@@ -27,8 +27,8 @@
             <!-- Header -->
             <div class="text-center">
                 <div
-                    class="mx-auto h-20 w-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
-                    <i class="fas fa-user-plus text-white text-2xl"></i>
+                    class="mx-auto flex items-center justify-center mb-4">
+                    <img src="{{ asset('images/Infoma_Branding-blue-05.png') }}" alt="Infoma Logo" class="w-16 h-16">
                 </div>
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">Bergabung dengan Infoma</h2>
                 <p class="text-gray-600">Buat akun baru untuk mengakses layanan kami</p>

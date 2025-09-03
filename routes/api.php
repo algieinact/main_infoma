@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\BookmarkController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\User\VoucherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,4 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+
+    // Voucher routes
+    Route::post('/vouchers/validate', [VoucherController::class, 'validateVoucher']);
+    Route::get('/vouchers/available', [VoucherController::class, 'getAvailableVouchers']);
 });
